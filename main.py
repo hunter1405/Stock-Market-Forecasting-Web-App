@@ -65,7 +65,7 @@ if st.button('Generate Forecast', key='generate_forecast_button'):
 
             # Extend the date index into the future
             last_date = historical_data.index[-1]
-            future_dates = pd.date_range(last_date, last_date + timedelta(days=forecast_period), closed='right')
+            future_dates = pd.date_range(start=last_date, periods=forecast_period + 1, freq='B')[1:]  # Business days
             
             # Select the model and generate the forecast
             if model_choice == 'Moving Average':
