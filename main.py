@@ -22,12 +22,15 @@ def holt_winters(series, period):
 
 # Extend Moving Average and Exponential Smoothing forecasts
 def extend_forecast(series, future_dates):
-    # Convert to Pandas Series if not already
+    # Ensure series is a Pandas Series
     series = pd.Series(series) if not isinstance(series, pd.Series) else series
 
     last_value = series.iloc[-1]
     future_forecast = pd.Series([last_value] * len(future_dates), index=future_dates)
-    return series.append(future_forecast)
+    
+    # Use concat instead of append
+    return pd.concat([series, future_forecast])
+
 
 
 # Streamlit UI for Data fetching
