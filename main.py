@@ -18,8 +18,7 @@ def exponential_smoothing(series, alpha):
 
 def holt_winters(series, period):
     model = ExponentialSmoothing(series, trend='add', seasonal='add', seasonal_periods=period)
-    model_fit = model.fit()
-    return model_fit.fittedvalues
+    return model.fit()  # Return the fitted model
 
 # Streamlit UI for Data fetching
 st.title('Stock Forecasting Application')
@@ -66,7 +65,7 @@ if st.button('Generate Forecast', key='generate_forecast_button'):
             # Extend the date index into the future
             last_date = historical_data.index[-1]
             future_dates = pd.date_range(start=last_date, periods=forecast_period + 1, freq='B')[1:]  # Business days
-            
+
             # Select the model and generate the forecast
             if model_choice == 'Moving Average':
                 forecast_result = moving_average(historical_data, window).reindex(historical_data.index.union(future_dates))
