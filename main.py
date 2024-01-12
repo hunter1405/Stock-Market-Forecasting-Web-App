@@ -11,10 +11,10 @@ def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
 
 # Functions for forecasting models
 def moving_average(series, window):
-    return series.rolling(window).mean()
+    return pd.Series(series.rolling(window).mean())
 
 def exponential_smoothing(series, alpha):
-    return series.ewm(alpha=alpha).mean()
+    return pd.Series(series.ewm(alpha=alpha).mean())
 
 def holt_winters(series, period):
     model = ExponentialSmoothing(series, trend='add', seasonal='add', seasonal_periods=period)
@@ -22,9 +22,13 @@ def holt_winters(series, period):
 
 # Extend Moving Average and Exponential Smoothing forecasts
 def extend_forecast(series, future_dates):
+    # Convert to Pandas Series if not already
+    series = pd.Series(series) if not isinstance(series, pd.Series) else series
+
     last_value = series.iloc[-1]
     future_forecast = pd.Series([last_value] * len(future_dates), index=future_dates)
     return series.append(future_forecast)
+
 
 # Streamlit UI for Data fetching
 st.title('Stock Forecasting Application')
