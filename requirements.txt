@@ -6,4 +6,3 @@ statsmodels
 plotly
 pandas_datareader
 
-
