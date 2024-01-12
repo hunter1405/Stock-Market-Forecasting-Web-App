@@ -14,9 +14,9 @@ st.title('Stock Forecasting Application')
 
 # Data fetching UI
 st.subheader('Fetch Stock Data')
-input_stock_code = st.text_input('Enter Stock Ticker', 'AAPL').upper()
-start_date = st.date_input('Start Date', datetime(2021, 1, 1))
-end_date = st.date_input('End Date', datetime.today())
+input_stock_code = st.text_input('Enter Stock Ticker', 'AAPL', key='fetch_stock_input').upper()
+start_date = st.date_input('Start Date', datetime(2021, 1, 1), key='start_date_input')
+end_date = st.date_input('End Date', datetime.today(), key='end_date_input')
 
 # Fetch and display the data
 if st.button('Fetch Data'):
@@ -71,7 +71,7 @@ if st.button('Fetch Data'):
 
 # Forecasting UI
 st.subheader('Forecasting')
-forecast_stock_code = st.text_input('Enter Stock Code for Forecast', 'AAPL')
+forecast_stock_code = st.text_input('Enter Stock Code for Forecast', 'AAPL', key='forecast_stock_input')
 
 # Create empty containers for user input to prevent rerun errors
 window = None
