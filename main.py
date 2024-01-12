@@ -2,7 +2,36 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-import yfinance as yf
+import pandas_datareader.data as web
+from datetime import datetime
+
+# Function to fetch stock data using pandas_datareader
+def fetch_stock_data(stock_code, start_date, end_date):
+    return web.DataReader(stock_code, 'yahoo', start_date, end_date)
+
+# Streamlit UI
+st.title('Stock Forecasting Application')
+
+# Data fetching UI
+st.subheader('Fetch Stock Data')
+input_stock_code = st.text_input('Enter Stock Ticker', 'AAPL').upper()
+start_date = st.date_input('Start Date', datetime(2021, 1, 1))
+end_date = st.date_input('End Date', datetime.today())
+
+# Fetch and display the data
+if st.button('Fetch Data'):
+    data = fetch_stock_data(input_stock_code, start_date, end_date)
+    st.write(data.head())  # Display the first few rows of the data
+
+    # Download button for the fetched data
+    csv = data.to_csv().encode('utf-8')
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name=f'{input_stock_code}.csv',
+        mime='text/csv',
+    )
+
 
 # Functions for forecasting models
 def moving_average(series, window):
