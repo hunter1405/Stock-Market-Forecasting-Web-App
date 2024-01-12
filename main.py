@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timedelta
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 # Function to fetch stock data using yfinance
 def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
@@ -41,6 +41,7 @@ if st.button('Fetch Data', key='fetch_data_button'):
 # Streamlit UI for Forecasting
 st.subheader('Forecasting')
 forecast_stock_code = st.text_input('Enter Stock Code for Forecast', key='forecast_stock_code')
+forecast_data_type = st.selectbox('Choose Data Type for Forecasting', ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'], key='forecast_data_type')
 model_choice = st.selectbox('Choose the Forecasting Model', ['Moving Average', 'Exponential Smoothing', 'Holt-Winters'], key='model_choice')
 
 # Depending on the model choice, display the appropriate widget to get the parameter(s)
@@ -52,26 +53,32 @@ elif model_choice == 'Exponential Smoothing':
 elif model_choice == 'Holt-Winters':
     period = st.slider('Seasonal Period', 2, 12, 4, key='period')
 
+# Choose forecast period
+forecast_period = st.number_input('Enter Forecast Period in Days', min_value=1, max_value=365, value=30, step=1, key='forecast_period')
+
 # Generate forecast
 if st.button('Generate Forecast', key='generate_forecast_button'):
     forecast_stock_code = forecast_stock_code or input_stock_code_fetch
     if forecast_stock_code:
         with st.spinner(f"Generating forecast for {forecast_stock_code}..."):
-            forecast_data = fetch_stock_data(forecast_stock_code, start_date, end_date, data_type_selection)
+            historical_data = fetch_stock_data(forecast_stock_code, start_date, end_date, forecast_data_type)
 
+            # Extend the date index into the future
+            last_date = historical_data.index[-1]
+            future_dates = pd.date_range(last_date, last_date + timedelta(days=forecast_period), closed='right')
+            
             # Select the model and generate the forecast
             if model_choice == 'Moving Average':
-                forecast_result = moving_average(forecast_data, window)
+                forecast_result = moving_average(historical_data, window).reindex(historical_data.index.union(future_dates))
             elif model_choice == 'Exponential Smoothing':
-                forecast_result = exponential_smoothing(forecast_data, alpha)
+                forecast_result = exponential_smoothing(historical_data, alpha).reindex(historical_data.index.union(future_dates))
             elif model_choice == 'Holt-Winters':
-                forecast_result = holt_winters(forecast_data, period)
+                model_fit = holt_winters(historical_data.dropna(), period)
+                forecast_result = model_fit.forecast(len(future_dates)).rename('Predicted Price')
+                forecast_result.index = future_dates
 
             # Combine actual and forecast data for plotting
-            combined_data = pd.DataFrame({
-                'Actual Price': forecast_data,
-                'Predicted Price': forecast_result
-            })
+            combined_data = pd.concat([historical_data.rename('Actual Price'), forecast_result], axis=1)
 
             # Display the forecast
             st.line_chart(combined_data)
