@@ -52,3 +52,22 @@ if st.button('Forecast'):
 
     # Display results
     st.line_chart(forecast)
+
+
+# After you have your forecast data ready, plot the chart with formatted dates
+fig, ax = plt.subplots()
+ax.plot(forecast.index, forecast.values)
+
+# Set major ticks format
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+
+# Rotate date labels for better readability
+plt.xticks(rotation=45)
+
+# Set labels and title
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Forecasted Stock Prices')
+
+# Render the plot in Streamlit
+st.pyplot(fig)
