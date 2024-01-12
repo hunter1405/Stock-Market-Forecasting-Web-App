@@ -1,4 +1,3 @@
-import pandas_datareader.data as web
 import streamlit as st
 import pandas as pd
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
@@ -6,50 +5,26 @@ import yfinance as yf
 from datetime import datetime
 
 # Function to fetch stock data using yfinance
-def fetch_stock_data(stock_code, start_date, end_date):
+def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
     stock_data = yf.download(stock_code, start=start_date, end=end_date)
-    return stock_data
+    return stock_data[data_type]
 
 # Streamlit UI for Data fetching
 st.title('Stock Forecasting Application')
+
+# Fetch Stock Data UI
 st.subheader('Fetch Stock Data')
-input_stock_code = st.text_input('Enter Stock Ticker', 'AAPL', key='input_stock_code').upper()
-start_date = st.date_input('Start Date', datetime(2021, 1, 1), key='start_date')
-end_date = st.date_input('End Date', datetime.today(), key='end_date')
-
-# Fetch and display the data
-if st.button('Fetch Data', key='fetch_data'):
-    data = fetch_stock_data(input_stock_code, start_date, end_date)
-    st.write(data.head())  # Display the first few rows of the data
-    csv = data.to_csv().encode('utf-8')
-    st.download_button(label="Download data as CSV", data=csv, file_name=f'{input_stock_code}.csv', mime='text/csv')
-
-# Functions for forecasting models
-def moving_average(series, window):
-    return series.rolling(window).mean()
-
-def exponential_smoothing(series, alpha):
-    return series.ewm(alpha=alpha).mean()
-
-def holt_winters(series, period):
-    model = ExponentialSmoothing(series, trend='add', seasonal='add', seasonal_periods=period)
-    model_fit = model.fit()
-    return model_fit.fittedvalues
-
-# Streamlit UI for Data fetching
-st.title('Stock Forecasting Application')
-st.subheader('Fetch Stock Data')
-input_stock_code = st.text_input('Enter Stock Ticker', 'AAPL', key='input_stock_code').upper()
+input_stock_code_fetch = st.text_input('Enter Stock Ticker to Fetch Data', 'AAPL', key='input_stock_code_fetch').upper()
 data_type_selection = st.selectbox('Select Data Type', ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'], key='data_type_selection')
 start_date = st.date_input('Start Date', datetime(2021, 1, 1), key='start_date')
 end_date = st.date_input('End Date', datetime.today(), key='end_date')
 
 # Fetch and display the data
-if st.button('Fetch Data', key='fetch_data'):
-    data = fetch_stock_data(input_stock_code, start_date, end_date, data_type_selection)
+if st.button('Fetch Data', key='fetch_data_button'):
+    data = fetch_stock_data(input_stock_code_fetch, start_date, end_date, data_type_selection)
     st.write(data.head())  # Display the first few rows of the data
     csv = data.to_csv().encode('utf-8')
-    st.download_button(label="Download data as CSV", data=csv, file_name=f'{input_stock_code}_{data_type_selection}.csv', mime='text/csv')
+    st.download_button(label="Download data as CSV", data=csv, file_name=f'{input_stock_code_fetch}_{data_type_selection}.csv', mime='text/csv')
 
 # Streamlit UI for Forecasting
 st.subheader('Forecasting')
@@ -66,12 +41,10 @@ elif model_choice == 'Holt-Winters':
     period = st.slider('Seasonal Period', 2, 12, 4, key='period')
 
 # Generate forecast
-if st.button('Generate Forecast', key='generate_forecast'):
-    # Use input from the data fetching UI if no new ticker is provided
-    forecast_stock_code = forecast_stock_code or input_stock_code
+if st.button('Generate Forecast', key='generate_forecast_button'):
+    forecast_stock_code = forecast_stock_code or input_stock_code_fetch
     if forecast_stock_code:
         with st.spinner(f"Generating forecast for {forecast_stock_code}..."):
-            # Fetch the stock data for forecasting
             forecast_data = fetch_stock_data(forecast_stock_code, start_date, end_date, data_type_selection)
 
             # Select the model and generate the forecast
