@@ -6,8 +6,12 @@ from datetime import datetime
 
 # Function to fetch stock data using pandas_datareader
 def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
-    stock_data = web.DataReader(stock_code, 'yahoo', start_date, end_date)
-    return stock_data[data_type]
+    try:
+        stock_data = web.DataReader(stock_code, 'yahoo', start_date, end_date)
+        return stock_data[data_type]
+    except Exception as e:
+        st.error(f"Error fetching stock data: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame on error
 
 # Functions for forecasting models
 def moving_average(series, window):
