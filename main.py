@@ -3,6 +3,7 @@ import pandas as pd
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import pandas_datareader.data as web
 from datetime import datetime
+import yfinance
 
 # Function to fetch stock data using pandas_datareader
 def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
