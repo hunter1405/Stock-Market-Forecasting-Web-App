@@ -61,4 +61,13 @@ if st.button('Generate Forecast', key='generate_forecast'):
 
             # Select the model and generate the forecast
             if model_choice == 'Moving Average':
-                forecast_result =
+                forecast_result = moving_average(forecast_data, window)
+            elif model_choice == 'Exponential Smoothing':
+                forecast_result = exponential_smoothing(forecast_data, alpha)
+            elif model_choice == 'Holt-Winters':
+                forecast_result = holt_winters(forecast_data, period)
+
+            # Display the forecast
+            st.line_chart(forecast_result)
+    else:
+        st.error('Please enter a stock code for forecasting.')
