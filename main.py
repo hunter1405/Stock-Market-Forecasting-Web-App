@@ -9,6 +9,18 @@ def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
     stock_data = yf.download(stock_code, start=start_date, end=end_date)
     return stock_data[data_type]
 
+# Functions for forecasting models
+def moving_average(series, window):
+    return series.rolling(window).mean()
+
+def exponential_smoothing(series, alpha):
+    return series.ewm(alpha=alpha).mean()
+
+def holt_winters(series, period):
+    model = ExponentialSmoothing(series, trend='add', seasonal='add', seasonal_periods=period)
+    model_fit = model.fit()
+    return model_fit.fittedvalues
+
 # Streamlit UI for Data fetching
 st.title('Stock Forecasting Application')
 
