@@ -3,4 +3,4 @@ pandas
 numpy
 matplotlib
 statsmodels
-yfinance
+yfinance==0.2.33
