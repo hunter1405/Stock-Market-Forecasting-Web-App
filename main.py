@@ -9,6 +9,18 @@ def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
     stock_data = web.DataReader(stock_code, 'yahoo', start_date, end_date)
     return stock_data[data_type]
 
+# Functions for forecasting models
+def moving_average(series, window):
+    return series.rolling(window).mean()
+
+def exponential_smoothing(series, alpha):
+    return series.ewm(alpha=alpha).mean()
+
+def holt_winters(series, period):
+    model = ExponentialSmoothing(series, trend='add', seasonal='add', seasonal_periods=period)
+    model_fit = model.fit()
+    return model_fit.fittedvalues
+
 # Streamlit UI for Data fetching
 st.title('Stock Forecasting Application')
 st.subheader('Fetch Stock Data')
@@ -26,4 +38,27 @@ if st.button('Fetch Data', key='fetch_data'):
 
 # Streamlit UI for Forecasting
 st.subheader('Forecasting')
-forecast
+forecast_stock_code = st.text_input('Enter Stock Code for Forecast', key='forecast_stock_code')
+model_choice = st.selectbox('Choose the Forecasting Model', ['Moving Average', 'Exponential Smoothing', 'Holt-Winters'], key='model_choice')
+
+# Depending on the model choice, display the appropriate widget to get the parameter(s)
+window = alpha = period = None
+if model_choice == 'Moving Average':
+    window = st.slider('Moving Average Window', 3, 30, 3, key='window')
+elif model_choice == 'Exponential Smoothing':
+    alpha = st.slider('Alpha', 0.01, 1.0, 0.1, key='alpha')
+elif model_choice == 'Holt-Winters':
+    period = st.slider('Seasonal Period', 2, 12, 4, key='period')
+
+# Generate forecast
+if st.button('Generate Forecast', key='generate_forecast'):
+    # Use input from the data fetching UI if no new ticker is provided
+    forecast_stock_code = forecast_stock_code or input_stock_code
+    if forecast_stock_code:
+        with st.spinner(f"Generating forecast for {forecast_stock_code}..."):
+            # Fetch the stock data for forecasting
+            forecast_data = fetch_stock_data(forecast_stock_code, start_date, end_date, data_type_selection)
+
+            # Select the model and generate the forecast
+            if model_choice == 'Moving Average':
+                forecast_result =
