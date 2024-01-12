@@ -52,6 +52,12 @@ forecast_stock_code = st.text_input('Enter Stock Code for Forecast', key='foreca
 forecast_data_type = st.selectbox('Choose Data Type for Forecasting', ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'], key='forecast_data_type')
 model_choice = st.selectbox('Choose the Forecasting Model', ['Moving Average', 'Exponential Smoothing', 'Holt-Winters'], key='model_choice')
 
+# Extend Moving Average and Exponential Smoothing forecasts
+def extend_forecast(series, future_dates):
+    last_value = series.iloc[-1]
+    future_forecast = pd.Series([last_value] * len(future_dates), index=future_dates)
+    return series.append(future_forecast)
+        
 # Depending on the model choice, display the appropriate widget to get the parameter(s)
 window = alpha = period = None
 if model_choice == 'Moving Average':
@@ -77,9 +83,11 @@ if st.button('Generate Forecast', key='generate_forecast_button'):
 
             # Select the model and generate the forecast
             if model_choice == 'Moving Average':
-                forecast_result = moving_average(historical_data, window).reindex(historical_data.index.union(future_dates))
+                ma_forecast = moving_average(historical_data, window)
+                forecast_result = extend_forecast(ma_forecast, future_dates)
             elif model_choice == 'Exponential Smoothing':
-                forecast_result = exponential_smoothing(historical_data, alpha).reindex(historical_data.index.union(future_dates))
+                es_forecast = exponential_smoothing(historical_data, alpha)
+                forecast_result = extend_forecast(es_forecast, future_dates)
             elif model_choice == 'Holt-Winters':
                 model_fit = holt_winters(historical_data.dropna(), period)
                 forecast_result = model_fit.forecast(len(future_dates)).rename('Predicted Price')
