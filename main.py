@@ -33,7 +33,7 @@ end_date = st.date_input('End Date', datetime.today(), key='end_date')
 # Fetch and display the data
 if st.button('Fetch Data', key='fetch_data_button'):
     data = fetch_stock_data(input_stock_code_fetch, start_date, end_date, data_type_selection)
-    st.write(data.head())  # Display the first few rows of the data
+    st.write(data.tail(10))  # Display the first few rows of the data
     csv = data.to_csv().encode('utf-8')
     st.download_button(label="Download data as CSV", data=csv, file_name=f'{input_stock_code_fetch}_{data_type_selection}.csv', mime='text/csv')
 
