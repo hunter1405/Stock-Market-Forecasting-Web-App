@@ -5,4 +5,5 @@ pandas
 statsmodels
 plotly
 pandas_datareader
+matplotlib.pyplot
 
