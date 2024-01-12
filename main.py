@@ -23,6 +23,13 @@ def holt_winters(series, period):
 # Streamlit UI for Data fetching
 st.title('Stock Forecasting Application')
 
+# Fetch Stock Data UI
+st.subheader('Fetch Stock Data')
+input_stock_code_fetch = st.text_input('Enter Stock Ticker to Fetch Data', 'AAPL', key='input_stock_code_fetch').upper()
+data_type_selection = st.selectbox('Select Data Type', ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'], key='data_type_selection')
+start_date = st.date_input('Start Date', datetime(2021, 1, 1), key='start_date')
+end_date = st.date_input('End Date', datetime.today(), key='end_date')
+
 # Fetch and display the data
 if st.button('Fetch Data', key='fetch_data_button'):
     data = fetch_stock_data(input_stock_code_fetch, start_date, end_date, data_type_selection)
