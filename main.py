@@ -32,15 +32,18 @@ end_date = st.date_input('End Date', datetime.today(), key='end_date')
 
 # Fetch and display the data
 if st.button('Fetch Data', key='fetch_data_button'):
-    data = fetch_stock_data(input_stock_code_fetch, start_date, end_date, data_type_selection)
-    
-    # Add a 'Stock' column to the DataFrame
-    data_with_stock = data.assign(Stock=input_stock_code_fetch)
+    data_series = fetch_stock_data(input_stock_code_fetch, start_date, end_date, data_type_selection)
 
-    st.write(data_with_stock.head())  # Display the first few rows of the data with the 'Stock' column
-    
+    # Convert the Series to a DataFrame
+    data_df = pd.DataFrame(data_series)
+
+    # Add a 'Stock' column to the DataFrame
+    data_df['Stock'] = input_stock_code_fetch
+
+    st.write(data_df.head())  # Display the first few rows of the data with the 'Stock' column
+
     # Preparing data for CSV download
-    csv_data = data_with_stock.to_csv().encode('utf-8')
+    csv_data = data_df.to_csv().encode('utf-8')
     st.download_button(label="Download data as CSV", data=csv_data, file_name=f'{input_stock_code_fetch}_{data_type_selection}.csv', mime='text/csv')
 
 # Streamlit UI for Forecasting
