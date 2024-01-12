@@ -47,6 +47,9 @@ if st.button('Forecast'):
     # Simulate fetching stock data
     data = get_stock_data(stock_code)
 
+    # Save the last date of the actual data to mark on the chart
+    last_actual_date = data.index[-1]
+
     # Select the model and generate forecast
     if model_choice == 'Moving Average':
         forecast = moving_average(data, window)
@@ -55,24 +58,16 @@ if st.button('Forecast'):
     elif model_choice == 'Holt-Winters':
         forecast = holt_winters(data, period)
 
-    # Plotting the forecast data with formatted dates
-    fig, ax = plt.subplots()
-    ax.plot(forecast.index, forecast.values)
+    # Create a combined DataFrame with actual and forecasted data
+    combined = pd.DataFrame({
+        'Actual Close': data,
+        'Forecast': forecast
+    })
 
-    # Set major ticks format
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    # Plot the actual and forecasted data using Streamlit's line_chart
+    st.line_chart(combined)
 
-    # Rotate date labels for better readability
-    plt.xticks(rotation=45)
+    # Annotate last actual data point
+    st.markdown(f"**Last Actual Close Price Date:** {last_actual_date.strftime('%Y-%m-%d')}")
 
-    # Set labels and title
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Price')
-    ax.set_title('Forecasted Stock Prices')
-
-    # Render the plot in Streamlit
-    st.pyplot(fig)
-
-# Check if the forecast variable exists before attempting to plot
-if forecast is not None:
-    st.line_chart(forecast)
+# The code for plotting using matplotlib has been removed as per your request.
