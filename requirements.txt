@@ -1,4 +1,5 @@
-streamlit
+streamlit>=0.78.0
+yfinance
+numpy
 pandas
 statsmodels
-yfinance
