@@ -67,7 +67,13 @@ if st.button('Generate Forecast', key='generate_forecast_button'):
             elif model_choice == 'Holt-Winters':
                 forecast_result = holt_winters(forecast_data, period)
 
+            # Combine actual and forecast data for plotting
+            combined_data = pd.DataFrame({
+                'Actual Price': forecast_data,
+                'Predicted Price': forecast_result
+            })
+
             # Display the forecast
-            st.line_chart(forecast_result)
+            st.line_chart(combined_data)
     else:
         st.error('Please enter a stock code for forecasting.')
