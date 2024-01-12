@@ -4,4 +4,6 @@ numpy
 pandas
 statsmodels
 plotly
+pandas_datareader
+
 
