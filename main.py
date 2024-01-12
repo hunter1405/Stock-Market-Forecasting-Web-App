@@ -8,6 +8,7 @@ from datetime import datetime
 def fetch_stock_data(stock_code, start_date, end_date, data_type='Close'):
     try:
         stock_data = web.DataReader(stock_code, 'yahoo', start_date, end_date)
+        print(stock_data)  # Debug: Print the raw data
         return stock_data[data_type]
     except Exception as e:
         st.error(f"Error fetching stock data: {e}")
